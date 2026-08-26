@@ -1,4 +1,4 @@
-# Northstar Commerce
+# ykSells
 
 MERN ecommerce capstone for The Tech Pulses Weeks 7-8 brief.
 

@@ -1,0 +1,1 @@
+const router = require('express').Router(); const c = require('../controllers/categoryController'); const { verifyToken, isAdmin } = require('../middleware/authMiddleware'); router.get('/', c.list); router.post('/', verifyToken, isAdmin, c.create); router.put('/:id', verifyToken, isAdmin, c.update); router.delete('/:id', verifyToken, isAdmin, c.remove); module.exports = router;

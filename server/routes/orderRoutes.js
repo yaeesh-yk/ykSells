@@ -1,0 +1,1 @@
+const router = require('express').Router(); const c = require('../controllers/orderController'); const { verifyToken } = require('../middleware/authMiddleware'); router.use(verifyToken); router.post('/', c.create); router.post('/:id/pay', c.pay); router.get('/my', c.mine); router.get('/:id', c.one); router.delete('/:id', c.cancel); module.exports = router;

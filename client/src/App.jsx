@@ -8,7 +8,8 @@ import { useAuth } from './context/AuthContext';
 import { useCart } from './context/CartContext';
 import './App.css';
 
-const stripePromise = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ? loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY) : null;
+const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+const stripePromise = stripeKey && /^pk_(test|live)_/.test(stripeKey) ? loadStripe(stripeKey) : null;
 const fallback = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=800&q=85';
 const useRequest = (request, initial = null) => { const [data, setData] = useState(initial); const [loading, setLoading] = useState(true); const [error, setError] = useState(''); useEffect(() => { let active = true; request().then((value) => active && setData(value)).catch((err) => active && setError(err.response?.data?.message || 'Unable to load this page.')).finally(() => active && setLoading(false)); return () => { active = false; }; }, []); return { data, setData, loading, error }; };
 function Layout({ children }) { const { user, logout } = useAuth(); const { items } = useCart(); return <><header><Link className="brand" to="/">ykSells</Link><nav><Link to="/products">Shop</Link>{user && <Link to="/orders">Orders</Link>}{user?.role === 'admin' && <Link to="/admin"><ShieldCheck size={16} /> Admin</Link>}</nav><div className="header-actions"><Link to="/cart" className="cart-link"><ShoppingBag size={19} /><b>{items.length}</b></Link>{user ? <><Link to="/profile" className="account">{user.name}</Link><button className="icon-button" title="Sign out" onClick={logout}><LogOut size={18} /></button></> : <Link to="/login" className="account"><UserRound size={18} /> Sign in</Link>}</div></header><main>{children}</main><footer>ykSells <span>Thoughtful goods, shipped with care.</span></footer></> }

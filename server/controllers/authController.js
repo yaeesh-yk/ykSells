@@ -3,7 +3,7 @@ const User = require('../models/User');
 
 const tokenFor = (user) => jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
 const register = async (req, res, next) => { try { const { name, email, password } = req.body; if (!name || !email || !password || password.length < 6) return res.status(400).json({ success: false, message: 'Name, valid email, and password of at least 6 characters are required' }); const exists = await User.findOne({ email }); if (exists) return res.status(409).json({ success: false, message: 'An account with this email already exists' }); const user = await User.create({ name, email, password }); res.status(201).json({ success: true, data: { user, token: tokenFor(user) } }); } catch (error) { next(error); } };
-const login = async (req, res, next) => { try { const user = await User.findOne({ email: req.body.email }); if (!user || !(await user.comparePassword(req.body.password || ''))) return res.status(401).json({ success: false, message: 'Invalid email or password' }); res.json({ success: true, data: { user, token: tokenFor(user) } }); } catch (error) { next(error); } };
+const login = async (req, res, next) => { try { const user = await User.findOne({ email: req.body.email }); if (!user || !(await user.comparePassword(req.body.password || ''))) return res.status(401).json({ success: false, message: 'Invalid email or password' }); if (req.body.role && user.role !== req.body.role) return res.status(403).json({ success: false, message: `This account is not registered as ${req.body.role}` }); res.json({ success: true, data: { user, token: tokenFor(user) } }); } catch (error) { next(error); } };
 const me = (req, res) => res.json({ success: true, data: { user: req.user } });
 const updateProfile = async (req, res, next) => {
 	try {
@@ -17,4 +17,5 @@ const updateProfile = async (req, res, next) => {
 		res.json({ success: true, data: { user, token: tokenFor(user) } });
 	} catch (error) { next(error); }
 };
-module.exports = { register, login, me, updateProfile };
+const ensureAdmin = async () => { if (!process.env.ADMIN_EMAIL || !process.env.ADMIN_PASSWORD) return; const existing = await User.findOne({ email: process.env.ADMIN_EMAIL.toLowerCase() }); if (existing) { if (existing.role !== 'admin') { existing.role = 'admin'; await existing.save(); } return; } await User.create({ name: 'Admin', email: process.env.ADMIN_EMAIL, password: process.env.ADMIN_PASSWORD, role: 'admin' }); console.log(`Admin account ready: ${process.env.ADMIN_EMAIL}`); };
+module.exports = { register, login, me, updateProfile, ensureAdmin };

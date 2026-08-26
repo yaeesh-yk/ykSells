@@ -8,6 +8,7 @@ const productRoutes = require('./routes/productRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const { ensureAdmin } = require('./controllers/authController');
 
 const app = express();
 const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173').split(',').map((origin) => origin.trim());
@@ -22,5 +23,5 @@ app.use('/api/admin', adminRoutes);
 
 app.use(errorHandler);
 const port = process.env.PORT || 5000;
-if (require.main === module) connectDB().then(() => app.listen(port, () => console.log(`API listening on ${port}`))).catch((error) => { console.error(error.message); process.exit(1); });
+if (require.main === module) connectDB().then(ensureAdmin).then(() => app.listen(port, () => console.log(`API listening on ${port}`))).catch((error) => { console.error(error.message); process.exit(1); });
 module.exports = app;

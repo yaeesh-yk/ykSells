@@ -17,6 +17,7 @@ MERN ecommerce capstone for The Tech Pulses Weeks 7-8 brief.
 - Build command: `npm install`
 - Start command: `npm start`
 - Add every variable from `server/.env.example`; set `CLIENT_URL` to the Vercel URL.
+- Set `ADMIN_EMAIL` and a strong `ADMIN_PASSWORD`; the admin account is created automatically when the server starts.
 
 ### Vercel frontend
 

@@ -11,8 +11,11 @@ const adminRoutes = require('./routes/adminRoutes');
 const { ensureAdmin } = require('./controllers/authController');
 
 const app = express();
-const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173').split(',').map((origin) => origin.trim());
-app.use(cors({ origin: (origin, callback) => !origin || allowedOrigins.includes(origin) ? callback(null, true) : callback(new Error('Origin not allowed by CORS')), credentials: true }));
+const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173').split(',').map((origin) => origin.trim().replace(/\/$/, ''));
+if (!allowedOrigins.includes('https://yk-sells-zc51-psi.vercel.app')) allowedOrigins.push('https://yk-sells-zc51-psi.vercel.app');
+const corsOptions = { origin: (origin, callback) => !origin || allowedOrigins.includes(origin.replace(/\/$/, '')) ? callback(null, true) : callback(new Error('Origin not allowed by CORS')), credentials: true, methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'], allowedHeaders: ['Content-Type', 'Authorization'] };
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json({ limit: '1mb' }));
 app.get('/api', (req, res) => res.json({ success: true, message: 'ykSells API is running' }));
 app.get('/api/health', (req, res) => res.json({ success: true, message: 'E-commerce API is running' }));
